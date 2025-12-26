@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Features Test Page</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #f5d547;
+            text-align: center;
+        }
+        
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .test-section h2 {
+            color: #17a2b8;
+            margin-top: 0;
+        }
+        
+        .test-item {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status.pass {
+            background: #28a745;
+        }
+        
+        .status.fail {
+            background: #dc3545;
+        }
+        
+        .status.warning {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        input[type="text"] {
+            padding: 8px;
+            width: 300px;
+            margin: 10px 0;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 5px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .output {
+            background: #000;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            min-height: 50px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            color: #28a745;
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        .info {
+            color: #17a2b8;
+        }
+        
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔒 Security Features Test Page</h1>
+    <p style="text-align: center;">Test the security implementations in the Jeopardy Buzzer System</p>
+    
+    <div class="test-section">
+        <h2>1. Input Sanitization Test</h2>
+        <p>Try entering potentially malicious input:</p>
+        
+        <input type="text" id="testInput" placeholder="Try: <script>alert('XSS')</script>">
+        <button onclick="testSanitization()">Test Sanitization</button>
+        
+        <div class="output" id="sanitizeOutput"></div>
+        
+        <h3>Pre-defined Tests:</h3>
+        <button onclick="testXSS()">Test XSS Attack</button>
+        <button onclick="testHTML()">Test HTML Injection</button>
+        <button onclick="testSpecialChars()">Test Special Characters</button>
+        <button onclick="testLongString()">Test Length Limit</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Security Headers Check</h2>
+        <div id="headersCheck"></div>
+        <button onclick="checkHeaders()">Check Current Headers</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. CSP Violation Test</h2>
+        <p>These tests should be blocked by Content Security Policy:</p>
+        <button onclick="testInlineScript()">Test Inline Script (Should Fail)</button>
+        <button onclick="testEval()">Test eval() (Should Fail)</button>
+        <button onclick="testExternalScript()">Test External Script (Should Fail)</button>
+        <div class="output" id="cspOutput"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Frame Protection Test</h2>
+        <button onclick="testFrameProtection()">Test Frame Embedding</button>
+        <div class="output" id="frameOutput"></div>
+        <div id="iframeContainer"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. HTTPS Check</h2>
+        <div id="httpsCheck"></div>
+        <button onclick="checkHTTPS()">Check Connection Security</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>6. Rate Limiting Simulation</h2>
+        <p>Simulate rapid buzzer presses:</p>
+        <button onclick="simulateRateLimit()">Spam Buzzer (3/sec limit)</button>
+        <div class="output" id="rateOutput"></div>
+    </div>
+    
+    <script>
+        // Input Sanitization Test
+        function sanitizeInput(input) {
+            if (!input) return '';
+            let sanitized = input.slice(0, 20);
+            sanitized = sanitized.replace(/<[^>]*>/g, '');
+            sanitized = sanitized.replace(/[^a-zA-Z0-9\s\-_]/g, '');
+            sanitized = sanitized.trim();
+            return sanitized;
+        }
+        
+        function testSanitization() {
+            const input = document.getElementById('testInput').value;
+            const sanitized = sanitizeInput(input);
+            const output = document.getElementById('sanitizeOutput');
+            
+            output.innerHTML = `
+                <div class="info">Original: ${escapeHtml(input)}</div>
+                <div class="success">Sanitized: ${escapeHtml(sanitized)}</div>
+                <div class="${input === sanitized ? 'success' : 'error'}">
+                    ${input === sanitized ? '✓ Input is safe' : '⚠ Input was sanitized'}
+                </div>
+            `;
+        }
+        
+        function testXSS() {
+            document.getElementById('testInput').value = "<script>alert('XSS')</script>";
+            testSanitization();
+        }
+        
+        function testHTML() {
+            document.getElementById('testInput').value = "<img src=x onerror=alert(1)>";
+            testSanitization();
+        }
+        
+        function testSpecialChars() {
+            document.getElementById('testInput').value = "Player!@#$%^&*()+={}[]|\\:;\"<>?,./";
+            testSanitization();
+        }
+        
+        function testLongString() {
+            document.getElementById('testInput').value = 'A'.repeat(50);
+            testSanitization();
+        }
+        
+        // Headers Check
+        function checkHeaders() {
+            const output = document.getElementById('headersCheck');
+            const checks = {
+                'CSP': document.querySelector('meta[http-equiv="Content-Security-Policy"]'),
+                'X-Frame-Options': document.querySelector('meta[http-equiv="X-Frame-Options"]'),
+                'X-Content-Type-Options': document.querySelector('meta[http-equiv="X-Content-Type-Options"]'),
+                'X-XSS-Protection': document.querySelector('meta[http-equiv="X-XSS-Protection"]'),
+                'Referrer-Policy': document.querySelector('meta[http-equiv="Referrer-Policy"]')
+            };
+            
+            let html = '<div class="test-item">';
+            for (const [name, element] of Object.entries(checks)) {
+                const status = element ? 'pass' : 'fail';
+                html += `<div>${name}: <span class="status ${status}">${element ? 'ENABLED' : 'MISSING'}</span></div>`;
+            }
+            html += '</div>';
+            output.innerHTML = html;
+        }
+        
+        // CSP Tests
+        function testInlineScript() {
+            const output = document.getElementById('cspOutput');
+            try {
+                eval('console.log("This should be blocked by CSP")');
+                output.innerHTML = '<div class="error">❌ CSP Failed: eval() executed</div>';
+            } catch (e) {
+                output.innerHTML = '<div class="success">✓ CSP Working: eval() blocked</div>';
+            }
+        }
+        
+        function testEval() {
+            const output = document.getElementById('cspOutput');
+            try {
+                new Function('return 1')();
+                output.innerHTML += '<div class="error">❌ CSP Failed: Function constructor executed</div>';
+            } catch (e) {
+                output.innerHTML += '<div class="success">✓ CSP Working: Function constructor blocked</div>';
+            }
+        }
+        
+        function testExternalScript() {
+            const output = document.getElementById('cspOutput');
+            const script = document.createElement('script');
+            script.src = 'https://example.com/malicious.js';
+            script.onerror = () => {
+                output.innerHTML += '<div class="success">✓ CSP Working: External script blocked</div>';
+            };
+            script.onload = () => {
+                output.innerHTML += '<div class="error">❌ CSP Failed: External script loaded</div>';
+            };
+            document.body.appendChild(script);
+        }
+        
+        // Frame Protection Test
+        function testFrameProtection() {
+            const output = document.getElementById('frameOutput');
+            const container = document.getElementById('iframeContainer');
+            
+            if (window.self !== window.top) {
+                output.innerHTML = '<div class="error">⚠ This page is embedded in an iframe!</div>';
+            } else {
+                output.innerHTML = '<div class="success">✓ Not embedded in iframe</div>';
+            }
+            
+            // Try to create an iframe
+            container.innerHTML = '<iframe src="index.html" width="100%" height="200"></iframe>';
+            output.innerHTML += '<div class="info">Attempted to create iframe - check X-Frame-Options</div>';
+        }
+        
+        // HTTPS Check
+        function checkHTTPS() {
+            const output = document.getElementById('httpsCheck');
+            const isHTTPS = location.protocol === 'https:';
+            const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            
+            let html = '<div class="test-item">';
+            html += `<div>Protocol: <code>${location.protocol}</code> <span class="status ${isHTTPS ? 'pass' : 'warning'}">${isHTTPS ? 'SECURE' : 'INSECURE'}</span></div>`;
+            html += `<div>Hostname: <code>${location.hostname}</code></div>`;
+            
+            if (!isHTTPS && !isLocalhost) {
+                html += '<div class="error">⚠ WARNING: Running without HTTPS in production!</div>';
+            } else if (!isHTTPS && isLocalhost) {
+                html += '<div class="info">ℹ Running on localhost (HTTPS not required for testing)</div>';
+            } else {
+                html += '<div class="success">✓ Connection is secure</div>';
+            }
+            
+            html += '</div>';
+            output.innerHTML = html;
+        }
+        
+        // Rate Limiting Simulation
+        function simulateRateLimit() {
+            const output = document.getElementById('rateOutput');
+            const maxBuzzesPerWindow = 3;
+            const rateLimitWindow = 1000;
+            const buzzerPressLog = [];
+            let html = '';
+            
+            output.innerHTML = '<div class="info">Simulating 10 rapid buzzer presses...</div>';
+            
+            let count = 0;
+            const interval = setInterval(() => {
+                const now = Date.now();
+                const recentPresses = buzzerPressLog.filter(time => now - time < rateLimitWindow);
+                
+                if (recentPresses.length >= maxBuzzesPerWindow) {
+                    html += `<div class="error">Buzz #${count + 1}: BLOCKED (rate limit exceeded)</div>`;
+                } else {
+                    buzzerPressLog.push(now);
+                    html += `<div class="success">Buzz #${count + 1}: ALLOWED (${recentPresses.length + 1}/${maxBuzzesPerWindow})</div>`;
+                }
+                
+                output.innerHTML = html;
+                count++;
+                
+                if (count >= 10) {
+                    clearInterval(interval);
+                    output.innerHTML += '<div class="info">Test complete!</div>';
+                }
+            }, 100); // 10 presses per second
+        }
+        
+        // Utility function
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Auto-check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            checkHeaders();
+            checkHTTPS();
+        });
+        
+        // Listen for CSP violations
+        document.addEventListener('securitypolicyviolation', (e) => {
+            console.warn('CSP Violation:', e.violatedDirective, e.blockedURI);
+        });
+    </script>
+</body>
+</html>
