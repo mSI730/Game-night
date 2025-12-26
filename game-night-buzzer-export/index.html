@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+    <meta http-equiv="Upgrade-Insecure-Requests" content="">
+    <title>Jeopardy Buzzer System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Authentication Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-content">
+            <h2>Host Authentication</h2>
+            <p>Please enter the host PIN to access controls</p>
+            <form id="authForm">
+                <input type="password" id="hostPin" placeholder="Enter PIN" maxlength="6" pattern="[0-9]{4,6}" required autocomplete="off">
+                <div class="auth-buttons">
+                    <button type="submit" class="auth-btn">Login</button>
+                    <button type="button" id="cancelAuth" class="auth-btn cancel">Cancel</button>
+                </div>
+                <div id="authError" class="auth-error"></div>
+            </form>
+            <p class="auth-hint">Default PIN: 1234 (Change in buzzer.js)</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>JEOPARDY! BUZZER SYSTEM</h1>
+            <div class="host-controls">
+                <button id="enableBuzzers" class="host-btn enable">ENABLE BUZZERS</button>
+                <button id="resetBuzzers" class="host-btn reset">RESET</button>
+            </div>
+        </header>
+
+        <div class="status-display">
+            <div id="statusMessage" class="status-message">Buzzers Disabled - Host: Press ENABLE</div>
+            <div id="timer" class="timer">0.000s</div>
+        </div>
+
+        <div class="players-container">
+            <div class="player" data-player="1">
+                <div class="player-header">
+                    <h2>PLAYER 1</h2>
+                    <div class="key-hint">Press Q</div>
+                </div>
+                <div class="buzzer-light" id="light1"></div>
+                <div class="player-name">
+                    <input type="text" id="name1" placeholder="Enter Name" maxlength="20">
+                </div>
+                <div class="buzz-time" id="time1">--</div>
+            </div>
+
+            <div class="player" data-player="2">
+                <div class="player-header">
+                    <h2>PLAYER 2</h2>
+                    <div class="key-hint">Press P</div>
+                </div>
+                <div class="buzzer-light" id="light2"></div>
+                <div class="player-name">
+                    <input type="text" id="name2" placeholder="Enter Name" maxlength="20">
+                </div>
+                <div class="buzz-time" id="time2">--</div>
+            </div>
+
+            <div class="player" data-player="3">
+                <div class="player-header">
+                    <h2>PLAYER 3</h2>
+                    <div class="key-hint">Press M</div>
+                </div>
+                <div class="buzzer-light" id="light3"></div>
+                <div class="player-name">
+                    <input type="text" id="name3" placeholder="Enter Name" maxlength="20">
+                </div>
+                <div class="buzz-time" id="time3">--</div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>Instructions</h3>
+            <ul>
+                <li><strong>Host:</strong> Click "ENABLE BUZZERS" to allow players to buzz in</li>
+                <li><strong>Players:</strong> Press your assigned key when buzzers are enabled</li>
+                <li><strong>First player to buzz locks out all others</strong></li>
+                <li><strong>Host:</strong> Click "RESET" to clear and enable buzzers again</li>
+                <li><strong>Keys:</strong> Player 1 (Q), Player 2 (P), Player 3 (M), or use Space Bar to enable</li>
+            </ul>
+        </div>
+
+        <div class="sound-settings">
+            <label>
+                <input type="checkbox" id="soundToggle" checked>
+                Enable Sound Effects
+            </label>
+        </div>
+
+        <div class="security-info">
+            <div class="security-status">
+                <span id="authStatus" class="status-indicator">🔒 Host: Not Authenticated</span>
+                <span id="sessionTimer" class="session-timer" style="display:none;"></span>
+            </div>
+            <button id="logoutBtn" class="logout-btn" style="display:none;">Logout</button>
+        </div>
+    </div>
+
+    <script src="buzzer.js"></script>
+</body>
+</html>
